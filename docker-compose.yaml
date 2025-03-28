@@ -1,0 +1,40 @@
+networks:
+  post:
+  get:
+services:
+  post-mssql:
+    container_name: post_DB
+    image: mcr.microsoft.com/mssql/server
+    env_file:
+      - ./MessagePost.API/.env
+    networks:
+      - post
+  post-api:
+    container_name: post_API
+    build: ./MessagePost.API
+    ports:
+      - "5001:8080"
+    networks:
+      - post
+    volumes:
+      - ./shared:/shared
+    depends_on:
+      - post-mssql
+  get-mssql:
+    container_name: get_DB
+    image: mcr.microsoft.com/mssql/server
+    env_file:
+      - ./MessageGet.API/.env
+    networks:
+      - get
+  get-api:
+    container_name: get_API
+    build: ./MessageGet.API
+    ports:
+      - "5002:8080"
+    networks:
+      - get
+    volumes:
+      - ./shared:/shared
+    depends_on:
+      - get-mssql
